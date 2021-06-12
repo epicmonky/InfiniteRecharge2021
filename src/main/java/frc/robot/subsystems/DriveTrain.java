@@ -16,6 +16,10 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SpeedController;
@@ -52,6 +56,8 @@ public class DriveTrain extends SubsystemBase {
 
   private final Gyro m_gyro;
 
+  private NetworkTable table;
+
   /** Creates a new DriveTrain. */
   public DriveTrain() {
     leftMotor0 = new WPI_VictorSPX(Constants.DRIVE_LEFT_VICTORSPX0);
@@ -59,10 +65,10 @@ public class DriveTrain extends SubsystemBase {
     rightMotor0 = new WPI_VictorSPX(Constants.DRIVE_RIGHT_VICTORSPX0);
     rightMotor1 = new WPI_VictorSPX(Constants.DRIVE_RIGHT_VICTORSPX1);
 
-    leftMotor0.setNeutralMode(NeutralMode.Brake);
-    leftMotor1.setNeutralMode(NeutralMode.Brake);
-    rightMotor0.setNeutralMode(NeutralMode.Brake);
-    rightMotor1.setNeutralMode(NeutralMode.Brake);
+    // leftMotor0.setNeutralMode(NeutralMode.Brake);
+    // leftMotor1.setNeutralMode(NeutralMode.Brake);
+    // rightMotor0.setNeutralMode(NeutralMode.Brake);
+    // rightMotor1.setNeutralMode(NeutralMode.Brake);
 
     m_left = new SpeedControllerGroup(leftMotor0, leftMotor1);
     m_right = new SpeedControllerGroup(rightMotor0, rightMotor1);
@@ -88,6 +94,11 @@ public class DriveTrain extends SubsystemBase {
     m_gyro = new ADXRS450_Gyro();
     m_gyro.calibrate();
     m_gyro.reset();
+
+    table = NetworkTableInstance.getDefault().getTable("limelight");
+    table.getEntry("ledMode").setNumber(1);
+    table.getEntry("camMode").setNumber(1);
+    CameraServer.getInstance().startAutomaticCapture();
 
     // Subsystem on SmartDashboard
     addChild("Drive", m_drive);
@@ -205,6 +216,24 @@ public class DriveTrain extends SubsystemBase {
     m_rightEncoder.reset();
   }
 
+  /**
+   * Gets the table entry at key s
+   * @param s is the key of the table entry
+   * @return NetworkTableEntry at given key
+   */
+  public NetworkTableEntry getTableEntry(String s) {
+    return table.getEntry(s);
+  }
+
+  /**
+   * Sets the Limelight table key to num
+   * @param s table key
+   * @param num mode
+   */
+  public void setTableNumber(String s, int num) {
+    table.getEntry(s).setNumber(num);
+  }
+
   public void log() {
     SmartDashboard.putNumber("Left motor output", m_left.get());
     SmartDashboard.putNumber("Right motor output", m_right.get());
@@ -214,6 +243,7 @@ public class DriveTrain extends SubsystemBase {
     SmartDashboard.putNumber("Right Encoder Distance", getRightEncoderDistance());
     SmartDashboard.putNumber("Left Encoder Rate", getLeftEncoderRate());
     SmartDashboard.putNumber("Right Encoder Rate", getRightEncoderRate());
+    SmartDashboard.putNumber("Limelight Pipeline", getTableEntry("pipeline").getDouble(9));
   }
 
 

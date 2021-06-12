@@ -5,9 +5,11 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.SlewRateLimiter;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // import frc.robot.commands.ArcadeDrive;
 import frc.robot.commands.AutoSequences.*;
+import frc.robot.commands.ArcadeDrive;
 // import frc.robot.commands.DriveStraight;
 import frc.robot.commands.IndexCommand;
 import frc.robot.commands.IntakeCommand;
@@ -15,8 +17,13 @@ import frc.robot.commands.IntakePistons;
 import frc.robot.commands.ShooterCommand;
 import frc.robot.commands.ShooterPistons;
 import frc.robot.commands.TankDrive;
+import frc.robot.commands.VisionDrive;
+import frc.robot.commands.ShootSpeeds.BlueShoot;
+import frc.robot.commands.ShootSpeeds.GreenShoot;
+import frc.robot.commands.ShootSpeeds.RedShoot;
 import frc.robot.commands.ShootSpeeds.ShootHigh;
 import frc.robot.commands.ShootSpeeds.ShootLow;
+import frc.robot.commands.ShootSpeeds.YellowShoot;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.IndexSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -44,6 +51,10 @@ public class RobotContainer {
   // private final AutoDrive m_autoDrive = new AutoDrive(m_driveTrain);
   // private final RotateDrive m_rotateDrive = new RotateDrive(m_driveTrain);
   private final AutoSlalom m_autoSlalom = new AutoSlalom(m_driveTrain);
+  private final AutoBounce m_autoBounce = new AutoBounce(m_driveTrain);
+  private final GalacticPath1 m_galacticpath1 = new GalacticPath1(m_driveTrain, m_intake, m_indexer);
+
+  private final SendableChooser<Object> m_chooser = new SendableChooser<Object>();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -58,6 +69,11 @@ public class RobotContainer {
     SmartDashboard.putData(m_indexer);
     SmartDashboard.putData(m_intake);
     SmartDashboard.putData(m_shooter);
+
+    // Configure auto chooser
+    m_chooser.setDefaultOption("autoSlalom", m_autoSlalom);
+    m_chooser.addOption("autoBounce", m_autoBounce);
+    SmartDashboard.putData("Autonomous", m_chooser);
   }
 
   /** Set default commands for subsystems based on controller input*/
@@ -65,11 +81,14 @@ public class RobotContainer {
 
     m_driveTrain.setDefaultCommand(
       new TankDrive(
-        () -> -m_speedLimiter.calculate(m_controller0.getLeftStickY()), 
-        () -> -m_speedLimiter.calculate(m_controller0.getRightStickY()), m_driveTrain) // Inverted because XboxController reads upward joystick as negative
-      // new DriveStraight(
-      //   () -> m_controller0.getLeftStickY(), m_driveTrain)
+        () -> -m_controller0.getLeftStickY(), 
+        () -> -m_controller0.getRightStickY(), m_driveTrain) // Inverted because XboxController reads upward joystick as negative
     );
+
+    // m_driveTrain.setDefaultCommand(
+    //   new ArcadeDrive(
+    //     () -> m_controller0.getLeftTrigger(), rotate, driveTrain)
+    // );
     
     m_intake.setDefaultCommand(
       new IntakeCommand(
@@ -95,11 +114,22 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    m_controller1.xButton.whenHeld(new IntakePistons(m_intake));
-    m_controller1.yButton.whenHeld(new ShooterPistons(m_shooter));
-    // m_controller1.aButton.whenHeld(new DriveStraight(m_driveTrain));
-    m_controller1.aButton.whileHeld(new ShootHigh(m_shooter));
-    m_controller1.bButton.whileHeld(new ShootLow(m_shooter));
+    // m_controller0.aButton.whenHeld(new VisionDrive(m_driveTrain, 3)); // Green zone
+    // m_controller0.bButton.whenHeld(new VisionDrive(m_driveTrain, 0)); // Red zone
+    // m_controller0.xButton.whenHeld(new VisionDrive(m_driveTrain, 1)); // Blue zone
+    // m_controller0.yButton.whenHeld(new VisionDrive(m_driveTrain, 2)); // Yellow zone
+
+    m_controller0.leftBumper.whenHeld(new ArcadeDrive(() -> -0.85, () -> 0, m_driveTrain));
+    m_controller0.rightBumper.whenHeld(new ArcadeDrive(() -> 0.85, () -> 0, m_driveTrain));
+
+    m_controller0.xButton.whenHeld(new IntakePistons(m_intake));
+    m_controller0.yButton.whenHeld(new ShooterPistons(m_shooter));
+ 
+    m_controller1.aButton.whileHeld(new GreenShoot(m_shooter));
+    m_controller1.bButton.whileHeld(new RedShoot(m_shooter));
+    m_controller1.xButton.whileHeld(new BlueShoot(m_shooter));
+    m_controller1.yButton.whileHeld(new YellowShoot(m_shooter));
+
   }
 
   /**
@@ -109,6 +139,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return m_autoSlalom;
+    return m_galacticpath1;
   }
 }

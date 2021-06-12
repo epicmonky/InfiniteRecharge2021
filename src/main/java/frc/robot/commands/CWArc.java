@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
 
@@ -44,6 +45,7 @@ public class CWArc extends CommandBase {
     // kBalance = 1 + kRatio * ratioError;
 
     m_driveTrain.tankDrive(m_leftVel, m_rightVel);
+    SmartDashboard.putString("Current Command", "CWArc");
   }
 
   // Called once the command ends or is interrupted.

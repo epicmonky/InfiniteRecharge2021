@@ -19,6 +19,7 @@ public class CrusaderController extends Joystick {
     public JoystickButton selectButton = new JoystickButton(this, 7);
     public JoystickButton leftStickButton = new JoystickButton(this, 9);
     public JoystickButton rightStickButton = new JoystickButton(this, 10);
+    
 
     
     

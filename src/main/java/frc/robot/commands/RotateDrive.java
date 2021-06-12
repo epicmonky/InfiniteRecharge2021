@@ -15,7 +15,7 @@ public class RotateDrive extends CommandBase {
   private double angle;
   private double error;
 
-  private double MAX_ROTATE = 1;
+  private double MAX_ROTATE = 0.5;
 
 
   /** Creates a new RotateDrive. */
@@ -43,7 +43,7 @@ public class RotateDrive extends CommandBase {
       kTurn = MAX_ROTATE;
     }
     kTurn *= Math.signum(angle);
-    m_driveTrain.tankDrive(-kTurn, kTurn);
+    m_driveTrain.tankDrive(kTurn, -kTurn);
 
   }
 
@@ -56,7 +56,7 @@ public class RotateDrive extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if(Math.abs(error) < 3) {
+    if(Math.abs(error) < 10) {
       return true;
     }
     return false;

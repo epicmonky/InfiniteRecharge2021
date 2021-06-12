@@ -4,21 +4,27 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
 
-public class BangDrive extends CommandBase {
+public class PIDCCWArc extends CommandBase {
 
   private final DriveTrain m_driveTrain;
-  private double distance;
-  private double speed;
+  private double m_leftVel;
+  private double m_rightVel;
+  private double m_angle;
 
-  /** Creates a new BangDrive. */
-  public BangDrive(DriveTrain driveTrain, double inDistance, double inSpeed) {
+  private double angleError;
+  private double kP = 0.00005;
+  private double kBalance;
+
+  /** Creates a new PIDCCWArc. */
+  public PIDCCWArc(DriveTrain driveTrain, double leftVel, double rightVel, double angle) {
     m_driveTrain = driveTrain;
-    distance = inDistance;
-    speed = inSpeed;
+    m_leftVel = leftVel;
+    m_rightVel = rightVel;
+    m_angle = angle;
+
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_driveTrain);
   }
@@ -33,22 +39,26 @@ public class BangDrive extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_driveTrain.tankDrive(speed, speed);
-    SmartDashboard.putString("Current Command", "BangDrive");
+    angleError = Math.abs(m_driveTrain.getHeading() - m_angle);
+    kBalance = angleError * kP;
+    if (m_rightVel * kBalance > 1) {
+      m_driveTrain.tankDrive(m_leftVel / m_rightVel, 1);
+    }
+    else {
+      m_driveTrain.tankDrive(m_leftVel * kBalance, m_rightVel * kBalance);
+    }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     m_driveTrain.stop();
-    m_driveTrain.resetEncoders();
-    m_driveTrain.resetGyro();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if (Math.abs(m_driveTrain.getAverageEncoderDistance()) > Math.abs(distance)) {
+    if (m_driveTrain.getHeading() < -m_angle) {
       return true;
     }
     else {

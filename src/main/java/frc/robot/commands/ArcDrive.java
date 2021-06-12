@@ -22,9 +22,6 @@ public class ArcDrive extends CommandBase {
   private double leftVel;
   private double rightVel;
 
-  private double leftIn;
-  private double rightIn;
-
   private double desiredRatio; // Left to right
   private double currentRatio;
   private double ratioError;

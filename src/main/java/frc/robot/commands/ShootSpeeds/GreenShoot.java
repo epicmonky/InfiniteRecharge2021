@@ -7,16 +7,16 @@ package frc.robot.commands.ShootSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ShooterSubsystem;
 
-public class ShootLow extends CommandBase {
+public class GreenShoot extends CommandBase {
 
-  private final ShooterSubsystem m_shooterSubsystem;
-  private final double lowShootSpeed = 0.92; // 0.93 works for yellow zone
+  private final ShooterSubsystem m_shooter;
+  private final double shoot = 0.92;
 
-  /** Creates a new ShootLow. */
-  public ShootLow(ShooterSubsystem shooterSubsystem) {
-    m_shooterSubsystem = shooterSubsystem;
+  /** Creates a new GreenShoot. */
+  public GreenShoot(ShooterSubsystem shooter) {
+    m_shooter = shooter;
 
-    addRequirements(m_shooterSubsystem);
+    addRequirements(m_shooter);
   }
 
   // Called when the command is initially scheduled.
@@ -26,7 +26,7 @@ public class ShootLow extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_shooterSubsystem.shoot(lowShootSpeed);
+    m_shooter.shoot(shoot);
   }
 
   // Called once the command ends or is interrupted.

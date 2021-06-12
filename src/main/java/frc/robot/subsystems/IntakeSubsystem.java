@@ -42,7 +42,7 @@ public class IntakeSubsystem extends SubsystemBase {
    * @param input in range [0.0, 1.0] 
    */
   public void intake(double input) {
-    if(input > 0.2) {
+    if(Math.abs(input) > 0.2) {
       m_intakeMotor.set(-input * 0.75); // Reverses direction of trigger input
     }
     else {
