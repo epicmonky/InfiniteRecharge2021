@@ -7,35 +7,39 @@ package frc.robot.commands;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.DriveTrain;
 
-public class IntakeCommand extends CommandBase {
+public class TankDrive extends CommandBase {
 
-  private final IntakeSubsystem m_intakeSubsystem;
-  private final DoubleSupplier m_input;
+  private final DriveTrain m_driveTrain;
+  private final DoubleSupplier m_leftSpeed;
+  private final DoubleSupplier m_rightSpeed;
 
-  /** Creates a new IntakeCommand. */
-  public IntakeCommand(DoubleSupplier input, IntakeSubsystem intakeSubsystem) {
-    m_intakeSubsystem = intakeSubsystem;
-    m_input = input;
-    
-    addRequirements(m_intakeSubsystem);
+  /** Creates a new TankDrive. */
+  public TankDrive(DoubleSupplier leftSpeed, DoubleSupplier rightSpeed, DriveTrain driveTrain) {
+    m_driveTrain = driveTrain;
+    m_leftSpeed = leftSpeed;
+    m_rightSpeed = rightSpeed;
+    addRequirements(m_driveTrain);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    m_driveTrain.resetEncoders();
+    m_driveTrain.resetGyro();
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_intakeSubsystem.intake(m_input.getAsDouble());
+    m_driveTrain.tankDrive(m_leftSpeed.getAsDouble(), m_rightSpeed.getAsDouble());
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_intakeSubsystem.stopIntake();
+    m_driveTrain.stop();
   }
 
   // Returns true when the command should end.
