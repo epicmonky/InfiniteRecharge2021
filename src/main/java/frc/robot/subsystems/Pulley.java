@@ -4,9 +4,8 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
-
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -15,7 +14,7 @@ import frc.robot.Constants;
 public class Pulley extends SubsystemBase {
   private final DoubleSolenoid dsolenoid;
   private boolean isIn;  
-  private final WPI_VictorSPX pulleymotor;
+  private final VictorSP pulleymotor;
   private final double shooter_threshold = 0.2;
   private final double limit = 0.75;
  
@@ -26,7 +25,7 @@ public class Pulley extends SubsystemBase {
         Constants.PULLEY_SOLENOID_RETRACT);
       isIn = false;
 
-      pulleymotor = new WPI_VictorSPX(Constants.PULLEY_MOTOR_VICTORSPX0);
+      pulleymotor = new VictorSP(Constants.PULLEY_MOTOR_VICTORSPX0);
   }
 
   @Override
@@ -46,7 +45,7 @@ public class Pulley extends SubsystemBase {
 
   public void pull(double input) {
     if (input > shooter_threshold) {
-        pulleymotor.set(-input * limit);
+        pulleymotor.set(input * limit);
     } else if (input < -shooter_threshold) {
         pulleymotor.set(input * limit);
     } else {

@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.SlewRateLimiter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // import frc.robot.commands.ArcadeDrive;
 import frc.robot.commands.AutoSequences.*;
+import frc.robot.commands.ArcadeDrive;
 // import frc.robot.commands.DriveStraight;
 import frc.robot.commands.IndexCommand;
 import frc.robot.commands.IntakeCommand;
@@ -70,10 +71,14 @@ public class RobotContainer {
 
     m_driveTrain.setDefaultCommand(
       new TankDrive(
-        () -> -m_speedLimiter.calculate(m_controller0.getLeftStickY()), 
-        () -> -m_speedLimiter.calculate(m_controller0.getRightStickY()), m_driveTrain) // Inverted because XboxController reads upward joystick as negative
-      // new DriveStraight(
-      //   () -> m_controller0.getLeftStickY(), m_driveTrain)
+        () -> -m_speedLimiter.calculate(m_controller0.getLeftStickX()), 
+        () -> -m_speedLimiter.calculate(m_controller0.getRightStickX()), 
+        m_driveTrain) // Inverted because XboxController reads upward joystick as negative
+
+      // new ArcadeDrive(
+      //   () -> -m_controller0.getLeftStickY(), 
+      //   () -> -m_controller0.getRightStickX(), 
+      //   m_driveTrain)
     );
     
     m_intake.setDefaultCommand(
@@ -81,10 +86,10 @@ public class RobotContainer {
         () -> m_controller1.getRightStickY(), m_intake)
     );
 
-    // m_indexer.setDefaultCommand(
-    //   new IndexCommand(
-    //     () -> m_controller1.getLeftStickY(), m_indexer)
-    // );
+    m_indexer.setDefaultCommand(
+      new IndexCommand(
+        () -> m_controller1.getLeftStickY(), m_indexer)
+    );
 
     m_shooter.setDefaultCommand(
       new ShooterCommand(
@@ -93,7 +98,7 @@ public class RobotContainer {
 
     m_pulley.setDefaultCommand(
       new PulleyCommand(
-        () -> m_controller1.getLeftStickY(), m_pulley)
+        () -> m_controller1.getLeftTrigger(), m_pulley)
     );
 
 
@@ -113,8 +118,6 @@ public class RobotContainer {
     m_controller1.aButton.whenHeld(new PulleyPiston(m_pulley));
     // m_controller1.aButton.whenHeld(new DriveStraight(m_driveTrain));
     // m_controller1.aButton.whileHeld(new ShootHigh(m_shooter));
-    m_controller1.bButton.whileHeld(new ShootLow(m_shooter));
-
     m_controller1.bButton.whileHeld(new ShootLow(m_shooter));
   }
 
